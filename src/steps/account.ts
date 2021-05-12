@@ -5,33 +5,36 @@ import {
 } from '@jupiterone/integration-sdk-core';
 
 import { IntegrationConfig } from '../config';
+import { getAcctWeblink } from '../util/getAcctWeblink';
 
-export const ACCOUNT_ENTITY_KEY = 'entity:account';
+export const DATA_ACCOUNT_ENTITY = 'DATA_ACCOUNT_ENTITY';
+export const ACCOUNT_ENTITY_TYPE = 'auth0_account';
 
 export async function fetchAccountDetails({
+  instance,
   jobState,
 }: IntegrationStepExecutionContext<IntegrationConfig>) {
+  const webLink = getAcctWeblink(instance.config.domain);
   const accountEntity = await jobState.addEntity(
     createIntegrationEntity({
       entityData: {
         source: {
-          id: 'acme-unique-account-id',
-          name: 'Example Co. Acme Account',
+          id: `Auth0 Account`,
+          name: 'Auth0 Account',
         },
         assign: {
-          _key: 'acme-unique-account-id',
-          _type: 'acme_account',
+          _key: `auth0-account:${instance.id}`,
+          _type: ACCOUNT_ENTITY_TYPE,
           _class: 'Account',
-          mfaEnabled: true,
-          // This is a custom property that is not a part of the data model class
-          // hierarchy. See: https://github.com/JupiterOne/data-model/blob/master/src/schemas/Account.json
-          manager: 'Manager Name',
+          name: 'Auth0 Account',
+          displayName: 'Auth0 Account',
+          webLink: webLink,
         },
       },
     }),
   );
 
-  await jobState.setData(ACCOUNT_ENTITY_KEY, accountEntity);
+  await jobState.setData(DATA_ACCOUNT_ENTITY, accountEntity);
 }
 
 export const accountSteps: IntegrationStep<IntegrationConfig>[] = [
@@ -40,8 +43,8 @@ export const accountSteps: IntegrationStep<IntegrationConfig>[] = [
     name: 'Fetch Account Details',
     entities: [
       {
-        resourceName: 'Account',
-        _type: 'acme_account',
+        resourceName: 'Auth0 Account',
+        _type: ACCOUNT_ENTITY_TYPE,
         _class: 'Account',
       },
     ],

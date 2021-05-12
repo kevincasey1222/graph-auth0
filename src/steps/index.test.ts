@@ -1,11 +1,27 @@
-import { createMockStepExecutionContext } from '@jupiterone/integration-sdk-testing';
+import {
+  createMockStepExecutionContext,
+  Recording,
+} from '@jupiterone/integration-sdk-testing';
 
 import { IntegrationConfig } from '../config';
-import { fetchGroups, fetchUsers } from './access';
+import { fetchUsers } from './users';
 import { fetchAccountDetails } from './account';
 import { integrationConfig } from '../../test/config';
+import { fetchClients } from './clients';
+import { setupAuth0Recording } from '../../test/recording';
+
+let recording: Recording;
+
+afterEach(async () => {
+  await recording.stop();
+});
 
 test('should collect data', async () => {
+  recording = setupAuth0Recording({
+    directory: __dirname,
+    name: 'steps',
+  });
+
   const context = createMockStepExecutionContext<IntegrationConfig>({
     instanceConfig: integrationConfig,
   });
@@ -14,7 +30,7 @@ test('should collect data', async () => {
   // See https://github.com/JupiterOne/sdk/issues/262.
   await fetchAccountDetails(context);
   await fetchUsers(context);
-  await fetchGroups(context);
+  await fetchClients(context);
 
   // Review snapshot, failure is a regression
   expect({
@@ -32,16 +48,18 @@ test('should collect data', async () => {
   expect(accounts).toMatchGraphObjectSchema({
     _class: ['Account'],
     schema: {
-      additionalProperties: false,
+      additionalProperties: true,
       properties: {
-        _type: { const: 'acme_account' },
-        manager: { type: 'string' },
+        _type: { const: 'auth0_account' },
+        name: { type: 'string' },
+        displayName: { type: 'string' },
+        webLink: { type: 'string', format: 'url' },
         _rawData: {
           type: 'array',
           items: { type: 'object' },
         },
       },
-      required: ['manager'],
+      required: ['name', 'displayName', 'webLink'],
     },
   });
 
@@ -52,40 +70,39 @@ test('should collect data', async () => {
   expect(users).toMatchGraphObjectSchema({
     _class: ['User'],
     schema: {
-      additionalProperties: false,
+      additionalProperties: true,
       properties: {
-        _type: { const: 'acme_user' },
-        firstName: { type: 'string' },
+        _type: { const: 'auth0_user' },
+        name: { type: 'string' },
+        displayName: { type: 'string' },
+        email: { type: 'string' },
         _rawData: {
           type: 'array',
           items: { type: 'object' },
         },
       },
-      required: ['firstName'],
+      required: ['name', 'displayName', 'email'],
     },
   });
 
-  const userGroups = context.jobState.collectedEntities.filter((e) =>
-    e._class.includes('UserGroup'),
+  const appClients = context.jobState.collectedEntities.filter((e) =>
+    e._class.includes('Application'),
   );
-  expect(userGroups.length).toBeGreaterThan(0);
-  expect(userGroups).toMatchGraphObjectSchema({
-    _class: ['UserGroup'],
+  expect(appClients.length).toBeGreaterThan(0);
+  expect(appClients).toMatchGraphObjectSchema({
+    _class: ['Application'],
     schema: {
-      additionalProperties: false,
+      additionalProperties: true,
       properties: {
-        _type: { const: 'acme_group' },
-        logoLink: {
-          type: 'string',
-          // Validate that the `logoLink` property has a URL format
-          format: 'url',
-        },
+        _type: { const: 'auth0_client' },
+        name: { type: 'string' },
+        tenant: { type: 'string' },
         _rawData: {
           type: 'array',
           items: { type: 'object' },
         },
       },
-      required: ['logoLink'],
+      required: [],
     },
   });
 });

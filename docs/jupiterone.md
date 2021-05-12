@@ -1,33 +1,25 @@
 # Integration with JupiterOne
 
-## {{provider}} + JupiterOne Integration Benefits
+## Auth0 + JupiterOne Integration Benefits
 
-TODO: Iterate the benefits of ingesting data from the provider into JupiterOne.
-Consider the following examples:
-
-- Visualize {{provider}} services, teams, and users in the JupiterOne graph.
-- Map {{provider}} users to employees in your JupiterOne account.
-- Monitor changes to {{provider}} users using JupiterOne alerts.
+- Visualize Auth0 clients (applications) and users in the JupiterOne graph.
+- Map Auth0 users to employees in your JupiterOne account.
+- Monitor changes to Auth0 users using JupiterOne alerts.
 
 ## How it Works
 
-TODO: Iterate significant activities the integration enables. Consider the
-following examples:
-
-- JupiterOne periodically fetches services, teams, and users from {{provider}}
-  to update the graph.
-- Write JupiterOne queries to review and monitor updates to the graph, or leverage existing queries.
-- Configure alerts to take action when JupiterOne graph changes, or leverage existing alerts.
+- JupiterOne periodically fetches clients and users from Auth0 to update the
+  graph.
+- Write JupiterOne queries to review and monitor updates to the graph, or
+  leverage existing queries.
+- Configure alerts to take action when JupiterOne graph changes, or leverage
+  existing alerts.
 
 ## Requirements
 
-TODO: Iterate requirements for setting up the integration. Consider the
-following examples:
-
-- {{provider}} supports the OAuth2 Client Credential flow. You must have a
-  Administrator user account.
-- JupiterOne requires a REST API key. You need permission to create a user in
-  {{provider}} that will be used to obtain the API key.
+- Auth0 supports the OAuth2 Client Credential flow. You will need to have access
+  to the Auth0 management dashboard and be able to enable permissions for a
+  Machine-to-Machine application.
 - You must have permission in JupiterOne to install new integrations.
 
 ## Support
@@ -37,40 +29,49 @@ If you need help with this integration, please contact
 
 ## Integration Walkthrough
 
-### In {{provider}}
+### In Auth0
 
-TODO: List specific actions that must be taken in the provider. Remove this
-section when there are no actions to take in the provider.
-
-1. [Generate a REST API key](https://example.com/docs/generating-api-keys)
+1. From the dashboard at
+   https://manage.auth0.com/dashboard/{YOURREGION}/{YOURDOMAIN}, select
+   Applications. Under Applications, select Applications.
+2. You can use the default Auth0 Management API (Test Application) Machine to
+   Machine application, or you can create your own Machine to Machine
+   application to connect to the Auth0 Management API.
+3. Go to the settings tab for your chosen Machine to Machine application and
+   make note of the Client ID and Client Secret.
+4. Go to the APIs tab for your chosen Machine to Machine application and ensure
+   that the Auth0 Management API is set to Authorized.
+5. To the right of the Authorized slider, click the downward arrow to expand the
+   permissions settings for the application. Filter permissions by "read",
+   select all of the read permissions displayed, and hit Update. (Or, select
+   individual read permissions if preferred).
 
 ### In JupiterOne
 
-TODO: List specific actions that must be taken in JupiterOne. Many of the
-following steps will be reusable; take care to be sure they remain accurate.
-
 1. From the configuration **Gear Icon**, select **Integrations**.
-2. Scroll to the **{{provider}}** integration tile and click it.
+2. Scroll to the **Auth0** integration tile and click it.
 3. Click the **Add Configuration** button and configure the following settings:
+
 - Enter the **Account Name** by which you'd like to identify this {{provider}}
-   account in JupiterOne. Ingested entities will have this value stored in
-   `tag.AccountName` when **Tag with Account Name** is checked.
+  account in JupiterOne. Ingested entities will have this value stored in
+  `tag.AccountName` when **Tag with Account Name** is checked.
 - Enter a **Description** that will further assist your team when identifying
-   the integration instance.
+  the integration instance.
 - Select a **Polling Interval** that you feel is sufficient for your monitoring
-   needs. You may leave this as `DISABLED` and manually execute the integration.
-- {{additional provider-specific settings}} Enter the **{{provider}} API Key** 
-generated for use by JupiterOne.
+  needs. You may leave this as `DISABLED` and manually execute the integration.
+- Enter the **Auth0 Client ID** for the Machine-to-Machine application
+  designated for JupiterOne's use.
+- Enter the **Auth0 Client Secret** for the Machine-to-Machine application
+  designated for JupiterOne's use.
+- Enter the **Auth0 Domain** for your Auth0 tenant. Format should be
+  `{YOURDOMAIN}.{REGION}.auth0.com`. Do not include `https://`.
+
 4. Click **Create Configuration** once all values are provided.
 
 # How to Uninstall
 
-TODO: List specific actions that must be taken to uninstall the integration.
-Many of the following steps will be reusable; take care to be sure they remain
-accurate.
-
 1. From the configuration **Gear Icon**, select **Integrations**.
-2. Scroll to the **{{provider}}** integration tile and click it.
+2. Scroll to the **Auth0** integration tile and click it.
 3. Identify and click the **integration to delete**.
 4. Click the **trash can** icon.
 5. Click the **Remove** button to delete the integration.
@@ -92,9 +93,11 @@ https://github.com/JupiterOne/sdk/blob/master/docs/integrations/development.md
 
 The following entities are created:
 
-| Resources | Entity `_type` | Entity `_class` |
-| --------- | -------------- | --------------- |
-| Account   | `acme_account` | `Account`       |
+| Resources     | Entity `_type`  | Entity `_class` |
+| ------------- | --------------- | --------------- |
+| Auth0 Account | `auth0_account` | `Account`       |
+| Auth0 Client  | `auth0_client`  | `Application`   |
+| User          | `auth0_user`    | `User`          |
 
 ### Relationships
 
@@ -102,9 +105,8 @@ The following relationships are created/mapped:
 
 | Source Entity `_type` | Relationship `_class` | Target Entity `_type` |
 | --------------------- | --------------------- | --------------------- |
-| `acme_account`        | **HAS**               | `acme_group`          |
-| `acme_account`        | **HAS**               | `acme_user`           |
-| `acme_group`          | **HAS**               | `acme_user`           |
+| `auth0_account`       | **HAS**               | `auth0_client`        |
+| `auth0_account`       | **HAS**               | `auth0_user`          |
 
 <!--
 ********************************************************************************
