@@ -43,8 +43,7 @@ If you need help with this integration, please contact
    that the Auth0 Management API is set to Authorized.
 5. To the right of the Authorized slider, click the downward arrow to expand the
    permissions settings for the application. Filter permissions by "read",
-   select all of the read permissions displayed, and hit Update. (Or, select
-   individual read permissions if preferred).
+   select `read:users` and `read:clients`, and hit Update.
 
 ### In JupiterOne
 
