@@ -1,36 +1,13 @@
-import http from 'http';
+const ManagementClient = require('auth0').ManagementClient;
 
 import { IntegrationProviderAuthenticationError } from '@jupiterone/integration-sdk-core';
 
 import { IntegrationConfig } from './config';
+import { Auth0ManagementClient } from './types/managementClient';
+import { Auth0User, Auth0UsersIncludeTotal } from './types/users';
+import { Auth0Client } from './types/clients';
 
 export type ResourceIteratee<T> = (each: T) => Promise<void> | void;
-
-// Providers often supply types with their API libraries.
-
-type AcmeUser = {
-  id: string;
-  name: string;
-};
-
-type AcmeGroup = {
-  id: string;
-  name: string;
-  users?: Pick<AcmeUser, 'id'>[];
-};
-
-// Those can be useful to a degree, but often they're just full of optional
-// values. Understanding the response data may be more reliably accomplished by
-// reviewing the API response recordings produced by testing the wrapper client
-// (below). However, when there are no types provided, it is necessary to define
-// opaque types for each resource, to communicate the records that are expected
-// to come from an endpoint and are provided to iterating functions.
-
-/*
-import { Opaque } from 'type-fest';
-export type AcmeUser = Opaque<any, 'AcmeUser'>;
-export type AcmeGroup = Opaque<any, 'AcmeGroup'>;
-*/
 
 /**
  * An APIClient maintains authentication state and provides an interface to
@@ -41,37 +18,31 @@ export type AcmeGroup = Opaque<any, 'AcmeGroup'>;
  * resources.
  */
 export class APIClient {
-  constructor(readonly config: IntegrationConfig) {}
+  managementClient: Auth0ManagementClient;
+  //retrieves a token automatically and applies it to subsequent requests
+  //token expiration is configured on the auth0 site; default is 24 hours
+  constructor(readonly config: IntegrationConfig) {
+    this.managementClient = new ManagementClient({
+      domain: config.domain,
+      clientId: config.clientId,
+      clientSecret: config.clientSecret,
+    });
+  }
 
   public async verifyAuthentication(): Promise<void> {
-    // TODO make the most light-weight request possible to validate
-    // authentication works with the provided credentials, throw an err if
-    // authentication fails
-    const request = new Promise<void>((resolve, reject) => {
-      http.get(
-        {
-          hostname: 'localhost',
-          port: 443,
-          path: '/api/v1/some/endpoint?limit=1',
-          agent: false,
-          timeout: 10,
-        },
-        (res) => {
-          if (res.statusCode !== 200) {
-            reject(new Error('Provider authentication failed'));
-          } else {
-            resolve();
-          }
-        },
-      );
-    });
+    //lightweight authen check
+    //limit the reply since we're just validating
+    const params = {
+      per_page: 1,
+      page: 0,
+    };
 
     try {
-      await request;
+      await this.managementClient.getUsers(params);
     } catch (err) {
       throw new IntegrationProviderAuthenticationError({
         cause: err,
-        endpoint: 'https://localhost/api/v1/some/endpoint?limit=1',
+        endpoint: this.config.domain,
         status: err.status,
         statusText: err.statusText,
       });
@@ -84,66 +55,120 @@ export class APIClient {
    * @param iteratee receives each resource to produce entities/relationships
    */
   public async iterateUsers(
-    iteratee: ResourceIteratee<AcmeUser>,
+    iteratee: ResourceIteratee<Auth0User>,
   ): Promise<void> {
-    // TODO paginate an endpoint, invoke the iteratee with each record in the
-    // page
+    //Auth0 sets the per_page max at 100 (default is 50)
+    //Also, they set an absolute max of 1000 users from any given query
+    //When we ask for .getUsers() in the management client, it is hitting the API
+    //with an unfiltered query against /api/v2/users, and that returns a max of 1000
+    //(10 pages of 100 users each). Even though we're only asking for a specific page
+    //of 100 users in a given call of .getUsers(), the API is selecting a max of 1000
+    //users to draw that result from, which could lead to inconsistent results if there
+    //are more than 1000 users in the system
+
+    //Therefore, if there are more than 1000 users to ingest, we'll have to filter the
+    //searches somehow. 
     //
-    // The provider API will hopefully support pagination. Functions like this
-    // should maintain pagination state, and for each page, for each record in
-    // the page, invoke the `ResourceIteratee`. This will encourage a pattern
-    // where each resource is processed and dropped from memory.
+    //The recursive routine below tries to pull all users. If that is
+    //greater than 999, we assume that we're hitting the limit, so the routine starts 
+    //pulling users by the last character of their user_id field (which can be 0-9 or a-d).
+    //
+    //If any of those still has greater than 999 users, it recurses again, subdividing the 
+    //group by the last 2 letters of the user_id field. In this way, it subdivides by a 
+    //factor of 16.
+    //
+    //The subdividing happens based on the last character of user_id because this is the
+    //character that changes the most in a large batch of users, and is statistically
+    //likely to form a fairly balanced subdivision. 
+    
+    //We can filter on any user attribute. The specific best choice probably depends on
+    //the use case. Filter query documentation is here:
+    //https://auth0.com/docs/users/user-search/user-search-query-syntax
+    // Client params syntax is here:
+    //https://auth0.github.io/node-auth0/module-management.ManagementClient.html#getUsers
 
-    const users: AcmeUser[] = [
-      {
-        id: 'acme-user-1',
-        name: 'User One',
-      },
-      {
-        id: 'acme-user-2',
-        name: 'User Two',
-      },
-    ];
-
-    for (const user of users) {
-      await iteratee(user);
-    }
+    await this.recursiveUserIterateeProcessor(iteratee, 0, '');
   }
 
   /**
-   * Iterates each group resource in the provider.
+   * Iterates each client (ie. Application) resource in the provider.
    *
    * @param iteratee receives each resource to produce entities/relationships
    */
-  public async iterateGroups(
-    iteratee: ResourceIteratee<AcmeGroup>,
+  public async iterateClients(
+    iteratee: ResourceIteratee<Auth0Client>,
   ): Promise<void> {
-    // TODO paginate an endpoint, invoke the iteratee with each record in the
-    // page
-    //
-    // The provider API will hopefully support pagination. Functions like this
-    // should maintain pagination state, and for each page, for each record in
-    // the page, invoke the `ResourceIteratee`. This will encourage a pattern
-    // where each resource is processed and dropped from memory.
-
-    const groups: AcmeGroup[] = [
-      {
-        id: 'acme-group-1',
-        name: 'Group One',
-        users: [
-          {
-            id: 'acme-user-1',
-          },
-        ],
-      },
-    ];
-
-    for (const group of groups) {
-      await iteratee(group);
+    //see Users comments for API limitations, though they are unlikely to be a problem here
+    let appCount: number = 1;
+    let pageNum: number = 0;
+    while (appCount > 0) {
+      const params = {
+        per_page: 100,
+        page: pageNum,
+      };
+      const clients: Auth0Client[] = await this.managementClient.getClients(
+        params,
+      );
+      appCount = clients.length;
+      pageNum = pageNum + 1;
+      for (const client of clients) {
+        await iteratee(client);
+      }
     }
   }
+
+  public async recursiveUserIterateeProcessor(
+    iteratee: ResourceIteratee<Auth0User>, 
+    depthLevel: number, 
+    tailString: string) {
+    //depthLevel should be the number of characters on the tail
+    //in other words, tail string should be depthLevel characters long
+    const tooManyUsers = 1000; //never set this to less than 2 or infinite recursion occurs
+    const usersPerPage = 100; //defaults to 50, max is 100
+    const tails: string[] = [ '0', '1' , '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' ];
+    //will a query at the current depth level return 1000 users? If so, we need recursion
+    const queryString = 'user_id:auth0|*' + tailString;
+    const params = {
+      per_page: usersPerPage,
+      page: 0,
+      q: queryString,
+      include_totals: true,
+    };
+    const reply: Auth0UsersIncludeTotal = await this.managementClient.getUsers(params);
+    const total = reply.total;
+    if (total < tooManyUsers) {
+      //execute what you got and then go get the rest of the pages
+      for (const user of reply.users) {
+        await iteratee(user);
+      }
+      let pageNum = 1;
+      let leftToGet = total - reply.length;
+      while (leftToGet > 0) {
+        const localParams = {
+          per_page: usersPerPage,
+          page: pageNum,
+          q: queryString,
+          include_totals: true,
+        }; 
+        const response: Auth0UsersIncludeTotal = await this.managementClient.getUsers(localParams);
+        for (const user of response.users) {
+          await iteratee(user);
+        }
+        leftToGet = leftToGet - response.length;
+        pageNum = pageNum + 1;      
+      }
+    } else {
+      //recurse
+      for (const tail in tails) {
+        const fulltail: string = tails[tail].concat(tailString);
+        await this.recursiveUserIterateeProcessor(iteratee, depthLevel+1, fulltail);
+      }
+    }
+  }
+
 }
 
 export function createAPIClient(config: IntegrationConfig): APIClient {
   return new APIClient(config);
 }
+

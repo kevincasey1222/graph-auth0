@@ -1,28 +1,44 @@
 # Development
 
-Add details here to give a brief overview of how to work with the provider APIs.
-Please reference any SDKs or API docs used to help build the integration here.
+[Auth0's API schema](https://auth0.com/docs/api/management/v2/)
+[Auth0 NodeJS client](https://github.com/auth0/node-auth0)
+[Method documentation for NodeJS client](https://auth0.github.io/node-auth0/).
+Look specifically under ManagementClient.
+
+Conceptually, remember that the whole point of Auth0 as a service is for client
+applications to connect to Auth0, hand over user credentials, and receive
+authorization for some other purpose. The NodeJS client provided by Auth0 allows
+one to setup these client applications, and the use case of connecting to the
+Auth0 management API is considered just a special case of that general feature.
+
+So, as you are reading documentation, sometimes you will see information that is
+relevant to authorization for third-party apps, and that may or may not be
+relevant to connecting to the Auth0 management API for this integration. This
+integration uses the ManagementClient class of the NodeJs Auth0 client. The
+other classes in the client are for implementing Auth0 as a service for a
+production app.
 
 ## Prerequisites
 
-Supply details about software or tooling (like maybe Docker or Terraform) that
-is needed for development here.
-
-Please supply references to documentation that details how to install those
-dependencies here.
-
-Tools like Node.js and NPM are already covered in the [README](../README.md) so
-don't bother documenting that here.
+To simplify authentication, this integration uses package `auth0`, a NodeJS
+client that handles much of the authentication and actual API calls.
 
 ## Provider account setup
 
-Please provide information about the steps needed to create an account with a
-provider. Images and references to a provider's documentation is very helpful
-for new developers picking up your work.
+You can get a free account for 25 days:
+[here](https://auth0.com/signup?place=header&type=button&text=sign%20up)
+
+See ./jupiterone.md for details on provisioning the API connection.
 
 ## Authentication
 
-Supply details here for information on how to authenticate with a provider so
-that developers have an idea of what's needed to hit APIs. It may be useful to
-provide explanations for each value specified in the
-[`IntegrationInstanceConfigFieldMap`](../src/config.ts).
+Auth0 uses Oauth for authentication. There are many possible flows for this and
+many tweakable settings, but the basic setup for is for an application to
+identify itself with a Client ID and Client Secret, and then receive a token
+from `{YOURDOMAIN}.auth.com/oauth/token`, and then present that token in an
+Authorization header on future API requests (`Authoriation: 'Bearer {TOKEN}'`).
+
+This integration is using a nodejs client made by Auth0 that handles that behind
+the scenes, so long as you supply Client ID, Client Secret, and the Domain. Do
+not include `https://` in the Domain. It should be in the format
+`{YOURDOMAIN}.{YOURREGION}.auth0.com`.

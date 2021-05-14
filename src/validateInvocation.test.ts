@@ -32,6 +32,7 @@ it('auth error', async () => {
     instanceConfig: {
       clientId: 'INVALID',
       clientSecret: 'INVALID',
+      domain: 'dev-jupiterone.us.auth0.com',
     },
   });
 

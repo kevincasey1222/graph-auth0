@@ -28,6 +28,9 @@ export const instanceConfigFields: IntegrationInstanceConfigFieldMap = {
     type: 'string',
     mask: true,
   },
+  domain: {
+    type: 'string',
+  },
 };
 
 /**
@@ -44,6 +47,11 @@ export interface IntegrationConfig extends IntegrationInstanceConfig {
    * The provider API client secret used to authenticate requests.
    */
   clientSecret: string;
+
+  /**
+   * The provider API domain used to authenticate requests.
+   */
+  domain: string;
 }
 
 export async function validateInvocation(
@@ -51,9 +59,23 @@ export async function validateInvocation(
 ) {
   const { config } = context.instance;
 
-  if (!config.clientId || !config.clientSecret) {
+  if (!config.clientId || !config.clientSecret || !config.domain) {
     throw new IntegrationValidationError(
-      'Config requires all of {clientId, clientSecret}',
+      'Config requires all of {clientId, clientSecret, domain}',
+    );
+  }
+
+  const match = config.domain.match(/https?:\/\//);
+  if (match) {
+    throw new IntegrationValidationError(
+      'Config {domain} should not have https:// prepended',
+    );
+  }
+
+  const splitter = config.domain.split('.');
+  if (!(splitter[2] === 'auth0')) {
+    throw new IntegrationValidationError(
+      'Problem with config {domain}. Should be {YOURDOMAIN}.{REGION}.auth0.com',
     );
   }
 
