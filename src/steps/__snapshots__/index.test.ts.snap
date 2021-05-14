@@ -53,7 +53,6 @@ Object {
         },
       ],
       "_type": "auth0_user",
-      "appMetadata": undefined,
       "blocked": undefined,
       "createdAt": "2021-05-10T18:38:51.757Z",
       "createdOn": undefined,
@@ -74,9 +73,8 @@ Object {
       "picture": "https://s.gravatar.com/avatar/9ea4fa51e96ace12abc2f580a55d8dd7?s=480&r=pg&d=https%3A%2F%2Fcdn.auth0.com%2Favatars%2Fad.png",
       "updatedAt": "2021-05-10T18:38:51.757Z",
       "userId": "auth0|60997dbb9201390068ed3573",
-      "userMetadata": undefined,
       "username": "",
-      "webLink": "https://manage.auth0.com/dashboard/us/dev-jupiterone/users",
+      "webLink": "https://manage.auth0.com/dashboard/us/dev-jupiterone/users/auth0%7C60997dbb9201390068ed3573",
     },
     Object {
       "_class": Array [
@@ -107,7 +105,6 @@ Object {
         },
       ],
       "_type": "auth0_user",
-      "appMetadata": undefined,
       "blocked": undefined,
       "createdAt": "2021-05-06T16:28:13.644Z",
       "createdOn": undefined,
@@ -128,9 +125,8 @@ Object {
       "picture": "https://s.gravatar.com/avatar/94067c015850e0f500a37895e62dc45f?s=480&r=pg&d=https%3A%2F%2Fcdn.auth0.com%2Favatars%2Fth.png",
       "updatedAt": "2021-05-06T16:28:13.644Z",
       "userId": "auth0|6094191d9201390068ecb1da",
-      "userMetadata": undefined,
       "username": "",
-      "webLink": "https://manage.auth0.com/dashboard/us/dev-jupiterone/users",
+      "webLink": "https://manage.auth0.com/dashboard/us/dev-jupiterone/users/auth0%7C6094191d9201390068ecb1da",
     },
     Object {
       "_class": Array [
