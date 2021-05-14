@@ -125,7 +125,7 @@ export class APIClient {
     //in other words, tail string should be depthLevel characters long
     const tooManyUsers = 1000; //never set this to less than 2 or infinite recursion occurs
     const usersPerPage = 100; //defaults to 50, max is 100
-    const tails: string[] = [ '0', '1' , '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd'];
+    const tails: string[] = [ '0', '1' , '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' ];
     //will a query at the current depth level return 1000 users? If so, we need recursion
     const queryString = 'user_id:auth0|*' + tailString;
     const params = {

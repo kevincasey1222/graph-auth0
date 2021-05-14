@@ -20,6 +20,13 @@ export async function fetchUsers({
   const accountEntity = (await jobState.getData(DATA_ACCOUNT_ENTITY)) as Entity;
 
   await apiClient.iterateUsers(async (user) => {
+    //weblink uses the user_id, but user_id has the pipe '|' in it,
+    //and the SDK doesn't like it for validating URI format, so converting
+    //%7C is '|'
+    const weblink = accountEntity.webLink + 'users/auth0%7C' + user.user_id?.substring(6);
+    //unspecified content fields to delete for safety
+    delete user.user_metadata;
+    delete user.app_metadata;
     const userEntity = await jobState.addEntity(
       createIntegrationEntity({
         entityData: {
@@ -33,7 +40,7 @@ export async function fetchUsers({
             username: user.username || '',
             nickname: user.nickname,
             email: user.email,
-            webLink: accountEntity.webLink + 'users', //userids are hashed in user-specific URLs
+            webLink: weblink,
             userId: user.user_id,
             emailVerified: user.email_verified,
             phoneNumber: user.phone_number,
@@ -41,8 +48,6 @@ export async function fetchUsers({
             createdAt: user.created_at,
             updatedAt: user.updated_at,
             identities: JSON.stringify(user.identities), //array of objects
-            appMetadata: JSON.stringify(user.app_metadata), //object
-            userMetadata: JSON.stringify(user.user_metadata), //object
             picture: user.picture, //url
             multifactor: user.multifactor, //string[]
             lastIp: user.last_ip,
