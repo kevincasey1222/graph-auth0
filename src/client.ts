@@ -87,7 +87,7 @@ export class APIClient {
     // Client params syntax is here:
     //https://auth0.github.io/node-auth0/module-management.ManagementClient.html#getUsers
 
-    await this.recursiveUserIterateeProcessor(iteratee, 0, '');
+    await this.recursiveUserIterateeProcessor(iteratee);
   }
 
   /**
@@ -119,8 +119,8 @@ export class APIClient {
 
   public async recursiveUserIterateeProcessor(
     iteratee: ResourceIteratee<Auth0User>, 
-    depthLevel: number, 
-    tailString: string) {
+    depthLevel: number = 0, 
+    tailString: string = '') {
     //depthLevel should be the number of characters on the tail
     //in other words, tail string should be depthLevel characters long
     const tooManyUsers = 1000; //never set this to less than 2 or infinite recursion occurs
