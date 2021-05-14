@@ -33,6 +33,7 @@ it('auth error', async () => {
       clientId: 'INVALID',
       clientSecret: 'INVALID',
       domain: 'dev-jupiterone.us.auth0.com',
+      audience: 'https://dev-jupiterone.us.auth0.com/api/v2/'
     },
   });
 

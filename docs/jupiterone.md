@@ -64,6 +64,9 @@ If you need help with this integration, please contact
   designated for JupiterOne's use.
 - Enter the **Auth0 Domain** for your Auth0 tenant. Format should be
   `{YOURDOMAIN}.{REGION}.auth0.com`. Do not include `https://`.
+- Enter the **Auth0 Audience** for your Auth0 tenant, which points to the specific
+  API you will be using. Typically this is 
+  `https://{YOURDOMAIN}.{REGION}.auth0.com/api/v2/`
 
 4. Click **Create Configuration** once all values are provided.
 

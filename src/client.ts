@@ -26,6 +26,7 @@ export class APIClient {
       domain: config.domain,
       clientId: config.clientId,
       clientSecret: config.clientSecret,
+      audience: config.audience,
     });
   }
 
