@@ -1,4 +1,4 @@
-import { Auth0User } from './users';
+import { Auth0UsersIncludeTotal } from './users';
 import { Auth0Client } from './clients';
 
 /**
@@ -16,7 +16,10 @@ import { Auth0Client } from './clients';
  */
 export interface Auth0ManagementClient {
   // [API Endpoint]: https://auth0.github.io/node-auth0/module-management.ManagementClient.html#getUsers
-  getUsers: (params?: object) => Promise<Auth0User[]>;
+  // if the parameter "include_totals: true" is NOT included in params, then:
+  // getUsers: (params?: object) => Promise<Auth0User[]>;
+  // if the parameter "include_totals: true" IS included in params, then:
+  getUsers: (params: object) => Promise<Auth0UsersIncludeTotal>;
 
   // [API Endpoint]: https://auth0.github.io/node-auth0/module-management.ManagementClient.html#getClients
   getClients: (params?: object) => Promise<Auth0Client[]>;

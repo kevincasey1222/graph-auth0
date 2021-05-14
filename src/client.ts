@@ -4,7 +4,7 @@ import { IntegrationProviderAuthenticationError } from '@jupiterone/integration-
 
 import { IntegrationConfig } from './config';
 import { Auth0ManagementClient } from './types/managementClient';
-import { Auth0User } from './types/users';
+import { Auth0User, Auth0UsersIncludeTotal } from './types/users';
 import { Auth0Client } from './types/clients';
 
 export type ResourceIteratee<T> = (each: T) => Promise<void> | void;
@@ -67,31 +67,27 @@ export class APIClient {
     //are more than 1000 users in the system
 
     //Therefore, if there are more than 1000 users to ingest, we'll have to filter the
-    //searches somehow. For example, we could iterate over the alphabet and get users by
-    //the first letter of their name with this additional param:
+    //searches somehow. 
     //
-    //q: 'name:a*'
+    //The recursive routine below tries to pull all users. If that is
+    //greater than 999, we assume that we're hitting the limit, so the routine starts 
+    //pulling users by the last character of their user_id field (which can be 0-9 or a-d).
     //
+    //If any of those still has greater than 999 users, it recurses again, subdividing the 
+    //group by the last 2 letters of the user_id field. In this way, it subdivides by a 
+    //factor of 16.
+    //
+    //The subdividing happens based on the last character of user_id because this is the
+    //character that changes the most in a large batch of users, and is statistically
+    //likely to form a fairly balanced subdivision. 
+    
     //We can filter on any user attribute. The specific best choice probably depends on
     //the use case. Filter query documentation is here:
     //https://auth0.com/docs/users/user-search/user-search-query-syntax
     // Client params syntax is here:
     //https://auth0.github.io/node-auth0/module-management.ManagementClient.html#getUsers
 
-    let userCount: number = 1;
-    let pageNum: number = 0;
-    while (userCount > 0) {
-      const params = {
-        per_page: 100,
-        page: pageNum,
-      };
-      const users: Auth0User[] = await this.managementClient.getUsers(params);
-      userCount = users.length;
-      pageNum = pageNum + 1;
-      for (const user of users) {
-        await iteratee(user);
-      }
-    }
+    await this.recursiveUserIterateeProcessor(iteratee, 0, '');
   }
 
   /**
@@ -120,8 +116,59 @@ export class APIClient {
       }
     }
   }
+
+  public async recursiveUserIterateeProcessor(
+    iteratee: ResourceIteratee<Auth0User>, 
+    depthLevel: number, 
+    tailString: string) {
+    //depthLevel should be the number of characters on the tail
+    //in other words, tail string should be depthLevel characters long
+    const tooManyUsers = 1000; //never set this to less than 2 or infinite recursion occurs
+    const usersPerPage = 100; //defaults to 50, max is 100
+    const tails: string[] = [ '0', '1' , '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd'];
+    //will a query at the current depth level return 1000 users? If so, we need recursion
+    const queryString = 'user_id:auth0|*' + tailString;
+    const params = {
+      per_page: usersPerPage,
+      page: 0,
+      q: queryString,
+      include_totals: true,
+    };
+    const reply: Auth0UsersIncludeTotal = await this.managementClient.getUsers(params);
+    const total = reply.total;
+    if (total < tooManyUsers) {
+      //execute what you got and then go get the rest of the pages
+      for (const user of reply.users) {
+        await iteratee(user);
+      }
+      let pageNum = 1;
+      let leftToGet = total - reply.length;
+      while (leftToGet > 0) {
+        const localParams = {
+          per_page: usersPerPage,
+          page: pageNum,
+          q: queryString,
+          include_totals: true,
+        }; 
+        const response: Auth0UsersIncludeTotal = await this.managementClient.getUsers(localParams);
+        for (const user of response.users) {
+          await iteratee(user);
+        }
+        leftToGet = leftToGet - response.length;
+        pageNum = pageNum + 1;      
+      }
+    } else {
+      //recurse
+      for (const tail in tails) {
+        const fulltail: string = tails[tail].concat(tailString);
+        await this.recursiveUserIterateeProcessor(iteratee, depthLevel+1, fulltail);
+      }
+    }
+  }
+
 }
 
 export function createAPIClient(config: IntegrationConfig): APIClient {
   return new APIClient(config);
 }
+
