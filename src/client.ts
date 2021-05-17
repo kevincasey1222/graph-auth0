@@ -1,4 +1,5 @@
 const ManagementClient = require('auth0').ManagementClient;
+const nJwt = require('njwt');
 
 import { IntegrationProviderAuthenticationError } from '@jupiterone/integration-sdk-core';
 
@@ -6,6 +7,7 @@ import { IntegrationConfig } from './config';
 import { Auth0ManagementClient } from './types/managementClient';
 import { Auth0User, Auth0UsersIncludeTotal } from './types/users';
 import { Auth0Client } from './types/clients';
+import { getAcctWeblink } from './util/getAcctWeblink';
 
 export type ResourceIteratee<T> = (each: T) => Promise<void> | void;
 
@@ -32,20 +34,52 @@ export class APIClient {
 
   public async verifyAuthentication(): Promise<void> {
     //lightweight authen check
-    //limit the reply since we're just validating
-    const params = {
-      per_page: 1,
-      page: 0,
-    };
-
+    let token: string = '[REDACTED]';
     try {
-      await this.managementClient.getUsers(params);
+      token = await this.managementClient.getAccessToken();
     } catch (err) {
       throw new IntegrationProviderAuthenticationError({
         cause: err,
         endpoint: this.config.domain,
         status: err.status,
         statusText: err.statusText,
+      });
+    }
+    //check for proper scopes
+    if (!(token === '[REDACTED]')) {
+      //make sure we're not on a recording
+      try {
+        nJwt.verify(token, '');
+      } catch (err) {
+        //error will throw because we didn't pass the signing key
+        //that's okay because we're just trying to parse, not validate
+        const scope = err.parsedBody.scope;
+        this.testScopes(scope);
+      }
+    }
+  }
+
+  public testScopes(scopeString) {
+    const match = scopeString.match(/read:users/);
+    if (!match) {
+      throw new IntegrationProviderAuthenticationError({
+        cause: undefined,
+        endpoint: `${this.config.audience}users`,
+        status: 'Insufficient scope for token',
+        statusText: `Scope read:users is required for this integration. Set it via the down arrow button on the right at ${getAcctWeblink(
+          this.config.domain,
+        )}applications/${this.config.clientId}/apis`,
+      });
+    }
+    const match2 = scopeString.match(/read:clients/);
+    if (!match2) {
+      throw new IntegrationProviderAuthenticationError({
+        cause: undefined,
+        endpoint: `${this.config.audience}clients`,
+        status: 'Insufficient scope for token',
+        statusText: `Scope read:clients is required for this integration. Set it via the down arrow button on the right at ${getAcctWeblink(
+          this.config.domain,
+        )}applications/${this.config.clientId}/apis`,
       });
     }
   }
@@ -68,20 +102,20 @@ export class APIClient {
     //are more than 1000 users in the system
 
     //Therefore, if there are more than 1000 users to ingest, we'll have to filter the
-    //searches somehow. 
+    //searches somehow.
     //
     //The recursive routine below tries to pull all users. If that is
-    //greater than 999, we assume that we're hitting the limit, so the routine starts 
+    //greater than 999, we assume that we're hitting the limit, so the routine starts
     //pulling users by the last character of their user_id field (which can be 0-9 or a-d).
     //
-    //If any of those still has greater than 999 users, it recurses again, subdividing the 
-    //group by the last 2 letters of the user_id field. In this way, it subdivides by a 
+    //If any of those still has greater than 999 users, it recurses again, subdividing the
+    //group by the last 2 letters of the user_id field. In this way, it subdivides by a
     //factor of 16.
     //
     //The subdividing happens based on the last character of user_id because this is the
     //character that changes the most in a large batch of users, and is statistically
-    //likely to form a fairly balanced subdivision. 
-    
+    //likely to form a fairly balanced subdivision.
+
     //We can filter on any user attribute. The specific best choice probably depends on
     //the use case. Filter query documentation is here:
     //https://auth0.com/docs/users/user-search/user-search-query-syntax
@@ -119,14 +153,41 @@ export class APIClient {
   }
 
   public async recursiveUserIterateeProcessor(
-    iteratee: ResourceIteratee<Auth0User>, 
-    depthLevel: number = 0, 
-    tailString: string = '') {
+    iteratee: ResourceIteratee<Auth0User>,
+    depthLevel: number = 0,
+    tailString: string = '',
+  ) {
+    //before starting, check for excessive recursion in case of error by code change
+    //Since depthlevel 0 pulls 1000 users, and each recursion multiples that by 16,
+    //depthlevel 3 can pull around 4 million users. Feel free to increase if needed.
+    if (depthLevel > 3) {
+      throw new Error(
+        `Excessive recursion detected in client.ts, iterateUsers, recursiveUserIterateeProcessor, depthlevel=${depthLevel}`,
+      );
+    }
+
     //depthLevel should be the number of characters on the tail
     //in other words, tail string should be depthLevel characters long
     const tooManyUsers = 1000; //never set this to less than 2 or infinite recursion occurs
     const usersPerPage = 100; //defaults to 50, max is 100
-    const tails: string[] = [ '0', '1' , '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' ];
+    const tails: string[] = [
+      '0',
+      '1',
+      '2',
+      '3',
+      '4',
+      '5',
+      '6',
+      '7',
+      '8',
+      '9',
+      'a',
+      'b',
+      'c',
+      'd',
+      'e',
+      'f',
+    ];
     //will a query at the current depth level return 1000 users? If so, we need recursion
     const queryString = 'user_id:auth0|*' + tailString;
     const params = {
@@ -135,7 +196,9 @@ export class APIClient {
       q: queryString,
       include_totals: true,
     };
-    const reply: Auth0UsersIncludeTotal = await this.managementClient.getUsers(params);
+    const reply: Auth0UsersIncludeTotal = await this.managementClient.getUsers(
+      params,
+    );
     const total = reply.total;
     if (total < tooManyUsers) {
       //execute what you got and then go get the rest of the pages
@@ -150,26 +213,30 @@ export class APIClient {
           page: pageNum,
           q: queryString,
           include_totals: true,
-        }; 
-        const response: Auth0UsersIncludeTotal = await this.managementClient.getUsers(localParams);
+        };
+        const response: Auth0UsersIncludeTotal = await this.managementClient.getUsers(
+          localParams,
+        );
         for (const user of response.users) {
           await iteratee(user);
         }
         leftToGet = leftToGet - response.length;
-        pageNum = pageNum + 1;      
+        pageNum = pageNum + 1;
       }
     } else {
       //recurse
       for (const tail in tails) {
         const fulltail: string = tails[tail].concat(tailString);
-        await this.recursiveUserIterateeProcessor(iteratee, depthLevel+1, fulltail);
+        await this.recursiveUserIterateeProcessor(
+          iteratee,
+          depthLevel + 1,
+          fulltail,
+        );
       }
     }
   }
-
 }
 
 export function createAPIClient(config: IntegrationConfig): APIClient {
   return new APIClient(config);
 }
-

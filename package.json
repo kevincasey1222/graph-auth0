@@ -26,7 +26,8 @@
     "prepack": "yarn build"
   },
   "dependencies": {
-    "auth0": "^2.34.2"
+    "auth0": "^2.34.2",
+    "njwt": "^1.0.0"
   },
   "peerDependencies": {
     "@jupiterone/integration-sdk-core": "^6.0.0"

@@ -33,7 +33,7 @@ export const instanceConfigFields: IntegrationInstanceConfigFieldMap = {
   },
   audience: {
     type: 'string',
-  }
+  },
 };
 
 /**
@@ -67,12 +67,18 @@ export async function validateInvocation(
 ) {
   const { config } = context.instance;
 
-  if (!config.clientId || !config.clientSecret || !config.domain || !config.audience) {
+  if (
+    !config.clientId ||
+    !config.clientSecret ||
+    !config.domain ||
+    !config.audience
+  ) {
     throw new IntegrationValidationError(
       'Config requires all of {clientId, clientSecret, domain, audience}',
     );
   }
 
+  //checks for domain
   const match = config.domain.match(/https?:\/\//);
   if (match) {
     throw new IntegrationValidationError(
@@ -84,6 +90,21 @@ export async function validateInvocation(
   if (!(splitter[2] === 'auth0')) {
     throw new IntegrationValidationError(
       'Problem with config {domain}. Should be {YOURDOMAIN}.{REGION}.auth0.com',
+    );
+  }
+
+  //checks for audience
+  const match2 = config.audience.match(/https?:\/\//);
+  if (!match2) {
+    throw new IntegrationValidationError(
+      'Config {audience} must have https:// prepended',
+    );
+  }
+
+  const splitter2 = config.audience.split('.');
+  if (!(splitter2[2] === 'auth0')) {
+    throw new IntegrationValidationError(
+      'Problem with config {audience}. Should be https://{YOURDOMAIN}.{REGION}.auth0.com/{API}/{VERSION}',
     );
   }
 
