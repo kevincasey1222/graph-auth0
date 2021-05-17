@@ -156,20 +156,26 @@ export class APIClient {
     iteratee: ResourceIteratee<Auth0User>,
     depthLevel: number = 0,
     tailString: string = '',
+    tooManyUsers: number = 1000, //never set this to less than 2 or infinite recursion occurs
+    usersPerPage: number = 100, //defaults to 50, max is 100
   ) {
     //before starting, check for excessive recursion in case of error by code change
-    //Since depthlevel 0 pulls 1000 users, and each recursion multiples that by 16,
-    //depthlevel 3 can pull around 4 million users. Feel free to increase if needed.
+    //Since depthlevel 0 pulls 1000 users, and each recursion multiples that by 15,
+    //depthlevel 3 can pull over 3 million users. Feel free to increase if needed.
     if (depthLevel > 3) {
       throw new Error(
         `Excessive recursion detected in client.ts, iterateUsers, recursiveUserIterateeProcessor, depthlevel=${depthLevel}`,
       );
     }
+    //also, make sure that tooManyUsers > 1
+    if (!(tooManyUsers > 1)) {
+      throw new Error(
+        `Function param tooManyUsers set too low, in client.ts, iterateUsers, recursiveUserIterateeProcessor, tooManyUsers=${tooManyUsers}`,
+      );
+    }
 
     //depthLevel should be the number of characters on the tail
     //in other words, tail string should be depthLevel characters long
-    const tooManyUsers = 1000; //never set this to less than 2 or infinite recursion occurs
-    const usersPerPage = 100; //defaults to 50, max is 100
     const tails: string[] = [
       '0',
       '1',
@@ -186,7 +192,7 @@ export class APIClient {
       'c',
       'd',
       'e',
-      'f',
+      //'f', //apparently, 'f' is not a legitimate character in hex-code userids
     ];
     //will a query at the current depth level return 1000 users? If so, we need recursion
     const queryString = 'user_id:auth0|*' + tailString;
