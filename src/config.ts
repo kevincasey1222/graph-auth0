@@ -31,6 +31,9 @@ export const instanceConfigFields: IntegrationInstanceConfigFieldMap = {
   domain: {
     type: 'string',
   },
+  audience: {
+    type: 'string',
+  }
 };
 
 /**
@@ -52,6 +55,11 @@ export interface IntegrationConfig extends IntegrationInstanceConfig {
    * The provider API domain used to authenticate requests.
    */
   domain: string;
+
+  /**
+   * The audience (example: http://tenant.auth0.com/api/v2) used to authenticate requests
+   */
+  audience: string;
 }
 
 export async function validateInvocation(
@@ -59,9 +67,9 @@ export async function validateInvocation(
 ) {
   const { config } = context.instance;
 
-  if (!config.clientId || !config.clientSecret || !config.domain) {
+  if (!config.clientId || !config.clientSecret || !config.domain || !config.audience) {
     throw new IntegrationValidationError(
-      'Config requires all of {clientId, clientSecret, domain}',
+      'Config requires all of {clientId, clientSecret, domain, audience}',
     );
   }
 
