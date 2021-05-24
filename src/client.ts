@@ -45,10 +45,7 @@ export class APIClient {
         statusText: err.statusText,
       });
     }
-    //check for proper scopes
-    if (!(token === '[REDACTED]')) {
-      this.verifyScopes(jwtDecode(token).scope);
-    }
+    this.verifyScopes(jwtDecode(token).scope);
   }
 
   private verifyScopes(scopeString) {
