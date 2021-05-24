@@ -54,30 +54,25 @@ export class APIClient {
         //error will throw because we didn't pass the signing key
         //that's okay because we're just trying to parse, not validate
         const scope = err.parsedBody.scope;
-        this.testScopes(scope);
+        this.verifyScopes(scope);
       }
     }
   }
 
-  public testScopes(scopeString) {
-    const match = scopeString.match(/read:users/);
-    if (!match) {
-      throw new IntegrationProviderAuthenticationError({
-        cause: undefined,
-        endpoint: `${this.config.audience}users`,
-        status: 'Insufficient scope for token',
-        statusText: `Scope read:users is required for this integration. Set it via the down arrow button on the right at ${getAcctWeblink(
-          this.config.domain,
-        )}applications/${this.config.clientId}/apis`,
-      });
+  private verifyScopes(scopeString) {
+    const missingScopes: string[] = [];
+    if (!/read:users/.test(scopeString)) {
+      missingScopes.push('read:users');
     }
-    const match2 = scopeString.match(/read:clients/);
-    if (!match2) {
+    if (!/read:clients/.test(scopeString)) {
+      missingScopes.push('read:clients');
+    }
+    if (missingScopes.length > 0) {
       throw new IntegrationProviderAuthenticationError({
         cause: undefined,
         endpoint: `${this.config.audience}clients`,
         status: 'Insufficient scope for token',
-        statusText: `Scope read:clients is required for this integration. Set it via the down arrow button on the right at ${getAcctWeblink(
+        statusText: `Required scopes ${missingScopes} not set. Set via the down arrow button on the right at ${getAcctWeblink(
           this.config.domain,
         )}applications/${this.config.clientId}/apis`,
       });

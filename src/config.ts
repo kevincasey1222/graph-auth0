@@ -79,8 +79,7 @@ export async function validateInvocation(
   }
 
   //checks for domain
-  const match = config.domain.match(/https?:\/\//);
-  if (match) {
+  if (/https?:\/\//.test(config.domain)) {
     throw new IntegrationValidationError(
       'Config {domain} should not have https:// prepended',
     );
@@ -94,8 +93,7 @@ export async function validateInvocation(
   }
 
   //checks for audience
-  const match2 = config.audience.match(/https?:\/\//);
-  if (!match2) {
+  if (!/https?:\/\//.test(config.audience)) {
     throw new IntegrationValidationError(
       'Config {audience} must have https:// prepended',
     );
