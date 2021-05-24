@@ -1,5 +1,5 @@
 const ManagementClient = require('auth0').ManagementClient;
-const nJwt = require('njwt');
+const jwtDecode = require('jwt-decode');
 
 import { IntegrationProviderAuthenticationError } from '@jupiterone/integration-sdk-core';
 
@@ -34,7 +34,7 @@ export class APIClient {
 
   public async verifyAuthentication(): Promise<void> {
     //lightweight authen check
-    let token: string = '[REDACTED]';
+    let token: string = '';
     try {
       token = await this.managementClient.getAccessToken();
     } catch (err) {
@@ -47,15 +47,7 @@ export class APIClient {
     }
     //check for proper scopes
     if (!(token === '[REDACTED]')) {
-      //make sure we're not on a recording
-      try {
-        nJwt.verify(token, '');
-      } catch (err) {
-        //error will throw because we didn't pass the signing key
-        //that's okay because we're just trying to parse, not validate
-        const scope = err.parsedBody.scope;
-        this.verifyScopes(scope);
-      }
+      this.verifyScopes(jwtDecode(token).scope);
     }
   }
 
