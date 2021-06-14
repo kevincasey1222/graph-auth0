@@ -1,6 +1,6 @@
 {
-  "name": "@jupiterone/integration-template",
-  "version": "0.0.0",
+  "name": "@jupiterone/graph-auth0",
+  "version": "0.1.0",
   "description": "A JupiterOne Integration for https://auth0.com/",
   "license": "MPL-2.0",
   "main": "dist/index.js",
@@ -30,11 +30,11 @@
     "jwt-decode": "^3.1.2"
   },
   "peerDependencies": {
-    "@jupiterone/integration-sdk-core": "^6.2.1"
+    "@jupiterone/integration-sdk-core": "^6.6.0"
   },
   "devDependencies": {
-    "@jupiterone/integration-sdk-core": "^6.2.1",
-    "@jupiterone/integration-sdk-dev-tools": "^6.2.1",
-    "@jupiterone/integration-sdk-testing": "^6.2.1"
+    "@jupiterone/integration-sdk-core": "^6.6.0",
+    "@jupiterone/integration-sdk-dev-tools": "^6.6.0",
+    "@jupiterone/integration-sdk-testing": "^6.6.0"
   }
 }
