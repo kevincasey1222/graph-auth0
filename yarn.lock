@@ -504,20 +504,20 @@
     "@types/yargs" "^15.0.0"
     chalk "^4.0.0"
 
-"@jupiterone/data-model@^0.28.0":
-  version "0.28.0"
-  resolved "https://registry.yarnpkg.com/@jupiterone/data-model/-/data-model-0.28.0.tgz#aff7f3e9822407b936d7c7d17928d19d24b588fa"
-  integrity sha512-/wT912Zbv/glI9tcI2pW1V5RHa+D2M837O0dli1D1hcCOqp0MrEz9ho8b/OU1xXJ72JZsBTj25ujSb7vBQJ7QA==
+"@jupiterone/data-model@^0.32.0":
+  version "0.32.0"
+  resolved "https://registry.yarnpkg.com/@jupiterone/data-model/-/data-model-0.32.0.tgz#2d2fae02b6c077b30f567d76989fc1c9bee1e51a"
+  integrity sha512-QORfi+8fIrbxHbLoc/v1y2vR0grC7qy8dt/jhRhncGHVyTwuruagqaKsJrKmv1BHbUzrkmOTIMRbeBEf5Gw/vw==
   dependencies:
     ajv "^8.0.0"
     ajv-formats "^2.0.0"
 
-"@jupiterone/integration-sdk-cli@^6.6.0":
-  version "6.6.0"
-  resolved "https://registry.yarnpkg.com/@jupiterone/integration-sdk-cli/-/integration-sdk-cli-6.6.0.tgz#6e58e1520b50d7c9247100333d1061d0af412506"
-  integrity sha512-evJk45kviyM4shQI4KOrQZeLxs9+yCNNiae7E6FI3+dG+N1FAnUK1B6otbpLesy0jbkedCZaLg6vL6ncNyNjxA==
+"@jupiterone/integration-sdk-cli@^6.11.1":
+  version "6.11.1"
+  resolved "https://registry.yarnpkg.com/@jupiterone/integration-sdk-cli/-/integration-sdk-cli-6.11.1.tgz#f4da51afc5f0f36610131fed70a1fb468f48d34c"
+  integrity sha512-dmGYosenywoQ3vpfUSzc/FSp8ALdOsrCWFnuz8JsBn0gwvtqYIEFKKOY0ZXUYQftfhkHQCnnCFu1OsSyQa7D0g==
   dependencies:
-    "@jupiterone/integration-sdk-runtime" "^6.6.0"
+    "@jupiterone/integration-sdk-runtime" "^6.11.1"
     commander "^5.0.0"
     globby "^11.0.0"
     json-diff "^0.5.4"
@@ -526,22 +526,22 @@
     upath "^1.2.0"
     vis "^4.21.0-EOL"
 
-"@jupiterone/integration-sdk-core@^6.6.0":
-  version "6.6.0"
-  resolved "https://registry.yarnpkg.com/@jupiterone/integration-sdk-core/-/integration-sdk-core-6.6.0.tgz#88db6732536979ee206c5cfd09dfcb871982443a"
-  integrity sha512-CKdglJhB3/trSteFlUsRElgzc7a8G42rOl3xutZ4a18RFnyhsqeLWzjG5SXDRvlPgIfL8Fm6mAg0qS/BtoZ+8A==
+"@jupiterone/integration-sdk-core@^6.11.1":
+  version "6.11.1"
+  resolved "https://registry.yarnpkg.com/@jupiterone/integration-sdk-core/-/integration-sdk-core-6.11.1.tgz#e6d30ad2ead8abe3362c635a5ca0781cd1f12993"
+  integrity sha512-wrvpX8WgTSg+n5q1fvqwiefSnYPhQAXv+VE77wvY9CdsmtXl6INvykJ+l9n3jT/mdvyr0kB9Ko7l88HC/6Dt0w==
   dependencies:
-    "@jupiterone/data-model" "^0.28.0"
+    "@jupiterone/data-model" "^0.32.0"
     lodash "^4.17.21"
     uuid "^8.3.2"
 
-"@jupiterone/integration-sdk-dev-tools@^6.6.0":
-  version "6.6.0"
-  resolved "https://registry.yarnpkg.com/@jupiterone/integration-sdk-dev-tools/-/integration-sdk-dev-tools-6.6.0.tgz#380507f5aa7a42a14ce88e47a961a3f225f89f70"
-  integrity sha512-QnUKFr9a+Ot9TuFt6bb/bQj65LpAVao2AUFnObhRw6uLR4BpBeBUTB9r0A0G3mCnEDnUxc55x+8k+2rG4iw1Vg==
+"@jupiterone/integration-sdk-dev-tools@^6.11.1":
+  version "6.11.1"
+  resolved "https://registry.yarnpkg.com/@jupiterone/integration-sdk-dev-tools/-/integration-sdk-dev-tools-6.11.1.tgz#745e5f1cdfac16f3aedc0211d505575690c8c8c2"
+  integrity sha512-iiyl0W4QZft0tcpKQ+ddvFcr+OSePXzZB+np0Xwxn/AupxHRbTRyQr1nqn/k7Vw0PhSKdzt4WENda0zByDEwrQ==
   dependencies:
-    "@jupiterone/integration-sdk-cli" "^6.6.0"
-    "@jupiterone/integration-sdk-testing" "^6.6.0"
+    "@jupiterone/integration-sdk-cli" "^6.11.1"
+    "@jupiterone/integration-sdk-testing" "^6.11.1"
     "@types/jest" "^25.2.3"
     "@types/node" "^14.0.5"
     "@typescript-eslint/eslint-plugin" "^4.22.0"
@@ -557,12 +557,12 @@
     ts-node "^9.1.1"
     typescript "^4.2.4"
 
-"@jupiterone/integration-sdk-runtime@^6.6.0":
-  version "6.6.0"
-  resolved "https://registry.yarnpkg.com/@jupiterone/integration-sdk-runtime/-/integration-sdk-runtime-6.6.0.tgz#8bda8fd7dd9cebe569525fe07701885b8a4ea8fb"
-  integrity sha512-L3TKqPA44obhGa3rLYtSkJKOInheAas0YHFh2v/rYk5VrwF2v6cFQBBQymozJ7oJkTVwJ6R/jncbqg3WEcxfBQ==
+"@jupiterone/integration-sdk-runtime@^6.11.1":
+  version "6.11.1"
+  resolved "https://registry.yarnpkg.com/@jupiterone/integration-sdk-runtime/-/integration-sdk-runtime-6.11.1.tgz#8d0d516a5e7941a4df1f3b45e41657cfb656fd99"
+  integrity sha512-OePnS1U1rqbCZ+vLqQYH/686qYnBvWPPjFOJXCxz5JMMv/W/r0WU/FkmaEwjHXxpj4GCIbh81pC0mabfBmkZ2A==
   dependencies:
-    "@jupiterone/integration-sdk-core" "^6.6.0"
+    "@jupiterone/integration-sdk-core" "^6.11.1"
     "@lifeomic/alpha" "^1.4.0"
     "@lifeomic/attempt" "^3.0.0"
     async-sema "^3.1.0"
@@ -580,13 +580,13 @@
     rimraf "^3.0.2"
     uuid "^7.0.3"
 
-"@jupiterone/integration-sdk-testing@^6.6.0":
-  version "6.6.0"
-  resolved "https://registry.yarnpkg.com/@jupiterone/integration-sdk-testing/-/integration-sdk-testing-6.6.0.tgz#66593370c7174cf0ce75f8caf4d240b34c96f348"
-  integrity sha512-TZXwuNie2g+37vnvckpibaXR/E0kQSflZYurNfgLZHGVWgDCDPa5W61PEjvVCq9B1/F1FUPVQ3ZhwkWURg4G9Q==
+"@jupiterone/integration-sdk-testing@^6.11.1":
+  version "6.11.1"
+  resolved "https://registry.yarnpkg.com/@jupiterone/integration-sdk-testing/-/integration-sdk-testing-6.11.1.tgz#6bc8757f01b355da0f82db573bfd8f638b904877"
+  integrity sha512-aQUEuHjft9RZhd2Ln/nKWevhe3Uikr31sbDC+4iNk0Qp2vfZbmFToHjUPhfUbZk2uDwji2X/pTKloeieNQv9LA==
   dependencies:
-    "@jupiterone/integration-sdk-core" "^6.6.0"
-    "@jupiterone/integration-sdk-runtime" "^6.6.0"
+    "@jupiterone/integration-sdk-core" "^6.11.1"
+    "@jupiterone/integration-sdk-runtime" "^6.11.1"
     "@pollyjs/adapter-node-http" "^4.0.4"
     "@pollyjs/core" "^4.0.4"
     "@pollyjs/persister-fs" "^4.0.4"
@@ -1294,19 +1294,19 @@ atob@^2.1.2:
   resolved "https://registry.yarnpkg.com/atob/-/atob-2.1.2.tgz#6d9517eb9e030d2436666651e86bd9f6f13533c9"
   integrity sha512-Wm6ukoaOGJi/73p/cl2GvLjTI5JM1k/O14isD73YML8StrH/7/lRFgmg8nICZgD3bZZvjwCGxtMOD3wWNAu8cg==
 
-auth0@^2.35.0:
-  version "2.35.0"
-  resolved "https://registry.yarnpkg.com/auth0/-/auth0-2.35.0.tgz#2450d6f3810f4b811c9907228515e15e0e65e964"
-  integrity sha512-Pc1h+0opZeQ/0r93eLAO3ISqJ9z4LhiJeRsobwecZBxAN9DL+xS/3CUr1UMHWQQYIsoS0NX5FsTP2pBjeARFlQ==
+auth0@^2.36.0:
+  version "2.36.0"
+  resolved "https://registry.yarnpkg.com/auth0/-/auth0-2.36.0.tgz#bfc2c351b2951a4ae15a998a30ac23e483c52832"
+  integrity sha512-6omcPQ3x9iFBSRDnI1uvnD7ftqyQbts5T7g7WUuogTlwqJ7ms2jQdHx2IarKUylHhvD/+LTNa4mkOsrU00mPUg==
   dependencies:
     axios "^0.21.1"
     es6-promisify "^6.1.1"
-    form-data "^3.0.0"
+    form-data "^3.0.1"
     jsonwebtoken "^8.5.1"
     jwks-rsa "^1.12.1"
-    lru-memoizer "^2.1.0"
+    lru-memoizer "^2.1.4"
     rest-facade "^1.13.0"
-    retry "^0.12.0"
+    retry "^0.13.1"
 
 aws-sdk@^2.184.0:
   version "2.690.0"
@@ -2687,7 +2687,7 @@ forever-agent@~0.6.1:
   resolved "https://registry.yarnpkg.com/forever-agent/-/forever-agent-0.6.1.tgz#fbc71f0c41adeb37f96c577ad1ed42d8fdacca91"
   integrity sha1-+8cfDEGt6zf5bFd60e1C2P2sypE=
 
-form-data@^3.0.0:
+form-data@^3.0.0, form-data@^3.0.1:
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/form-data/-/form-data-3.0.1.tgz#ebd53791b78356a99af9a300d4282c4d5eb9755f"
   integrity sha512-RHkBKtLWUVwd7SqRIvCZMEvAMoGUp0XU+seQiZejj0COz3RI3hWP4sCv3gZWWLjJTd7rGwcsF5eKZGii0r/hbg==
@@ -4235,7 +4235,7 @@ lru-cache@~4.0.0:
     pseudomap "^1.0.1"
     yallist "^2.0.0"
 
-lru-memoizer@^2.1.0, lru-memoizer@^2.1.2:
+lru-memoizer@^2.1.2, lru-memoizer@^2.1.4:
   version "2.1.4"
   resolved "https://registry.yarnpkg.com/lru-memoizer/-/lru-memoizer-2.1.4.tgz#b864d92b557f00b1eeb322156a0409cb06dafac6"
   integrity sha512-IXAq50s4qwrOBrXJklY+KhgZF+5y98PDaNo0gi/v2KQBFLyWr+JyFvijZXkGKjQj/h9c0OwoE+JZbwUXce76hQ==
@@ -5251,10 +5251,10 @@ ret@~0.1.10:
   resolved "https://registry.yarnpkg.com/ret/-/ret-0.1.15.tgz#b8a4825d5bdb1fc3f6f53c2bc33f81388681c7bc"
   integrity sha512-TTlYpa+OL+vMMNG24xSlQGEJ3B/RzEfUlLct7b5G/ytav+wPrplCpVMFuwzXbkecJrb6IYo1iFb0S9v37754mg==
 
-retry@^0.12.0:
-  version "0.12.0"
-  resolved "https://registry.yarnpkg.com/retry/-/retry-0.12.0.tgz#1b42a6266a21f07421d1b0b54b7dc167b01c013b"
-  integrity sha1-G0KmJmoh8HQh0bC1S33BZ7AcATs=
+retry@^0.13.1:
+  version "0.13.1"
+  resolved "https://registry.yarnpkg.com/retry/-/retry-0.13.1.tgz#185b1587acf67919d63b357349e03537b2484658"
+  integrity sha512-XQBQ3I8W1Cge0Seh+6gjj03LbmRFWuoszgK9ooCpwYIrhhoO80pfq4cUkU5DkknwfOfFteRwlZ56PYOGYyFWdg==
 
 reusify@^1.0.4:
   version "1.0.4"
