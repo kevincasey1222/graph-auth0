@@ -62,11 +62,14 @@ If you need help with this integration, please contact
   designated for JupiterOne's use.
 - Enter the **Auth0 Client Secret** for the Machine-to-Machine application
   designated for JupiterOne's use.
-- Enter the **Auth0 Domain** for your Auth0 tenant. Format should be
-  `{YOURDOMAIN}.{REGION}.auth0.com`. Do not include `https://`.
-- Enter the **Auth0 Audience** for your Auth0 tenant, which points to the specific
-  API you will be using. Typically this is 
-  `https://{YOURDOMAIN}.{REGION}.auth0.com/api/v2/`
+- Enter the **Auth0 Domain** for your Auth0 tenant. Format is typically
+  `{YOURDOMAIN}.{REGION}.auth0.com`. Do not include `https://`. If you are using
+  a custom domain (e.g. 'mycustomdomain.com'), you can use it here.
+- Enter the **Auth0 Audience** for your Auth0 tenant, which points to the
+  specific API you will be using. Format must be
+  `https://{YOURDOMAIN}.{REGION}.auth0.com/api/v2/`. Even if you are using a
+  custom domain with Auth0, you need to use your default Auth0 tenant domain
+  here. Also, the trailing slash is necessary.
 
 4. Click **Create Configuration** once all values are provided.
 
