@@ -85,13 +85,6 @@ export async function validateInvocation(
     );
   }
 
-  const splitter = config.domain.split('.');
-  if (!(splitter[2] === 'auth0')) {
-    throw new IntegrationValidationError(
-      'Problem with config {domain}. Should be {YOURDOMAIN}.{REGION}.auth0.com',
-    );
-  }
-
   //checks for audience
   if (!/https?:\/\//.test(config.audience)) {
     throw new IntegrationValidationError(
@@ -99,10 +92,16 @@ export async function validateInvocation(
     );
   }
 
-  const splitter2 = config.audience.split('.');
-  if (!(splitter2[2] === 'auth0')) {
+  if (!config.audience.match(/auth0.com/)) {
     throw new IntegrationValidationError(
-      'Problem with config {audience}. Should be https://{YOURDOMAIN}.{REGION}.auth0.com/{API}/{VERSION}',
+      'Problem with config {audience}. Should be a subdomain of auth0.com.',
+    );
+  }
+
+  const finalChar = config.audience[config.audience.length - 1];
+  if (!(finalChar === '/')) {
+    throw new IntegrationValidationError(
+      'Problem with config {audience}. Trailing slash required.',
     );
   }
 

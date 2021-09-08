@@ -36,9 +36,27 @@ Auth0 uses Oauth for authentication. There are many possible flows for this and
 many tweakable settings, but the basic setup for is for an application to
 identify itself with a Client ID and Client Secret, and then receive a token
 from `{YOURDOMAIN}.auth.com/oauth/token`, and then present that token in an
-Authorization header on future API requests (`Authoriation: 'Bearer {TOKEN}'`).
+Authorization header on future API requests (`Authorization: 'Bearer {TOKEN}'`).
 
 This integration is using a nodejs client made by Auth0 that handles that behind
-the scenes, so long as you supply Client ID, Client Secret, and the Domain. Do
-not include `https://` in the Domain. It should be in the format
-`{YOURDOMAIN}.{YOURREGION}.auth0.com`.
+the scenes, so long as you supply Client ID, Client Secret, Domain and Audience.
+Do NOT include `https://` in the Domain. It should typically be in the format
+`{YOURDOMAIN}.{YOURREGION}.auth0.com`. DO include `https://` in the Audience. It
+must be something like `https://{YOURDOMAIN}.{REGION}.auth0.com/api/v2/`.
+
+It appears that the use of the `{REGION}` subdomain is inconsistent. See your
+Auth0 tenant default domain to be sure of which one to use.
+
+If you are using a custom domain (e.g. `mycustomdomain.com`), you can use that
+domain in the Domain config variable, but you still must use the default Auth0
+tenant domain in the Audience config variable.
+
+## Curl for verification
+
+If you want to test your config variables with cUrl, here is the sequence: curl
+--request POST --url 'https://{config.domain}/oauth/token' --header
+'content-type: application/json' --data
+'{"client_id":"{config.clientId}","client_secret":"{config.clientSecret}","audience":"{config.audience}","grant_type":"client_credentials"}'
+
+If you can get an Access Token in the reply using that, then your config
+variables are good.
