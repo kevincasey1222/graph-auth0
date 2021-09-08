@@ -12,6 +12,10 @@ and this project adheres to
 
 - Support for custom domains, and updated documentation on that.
 
+### Changed
+
+- Package updates.
+
 ## 0.1.0 - 2021-06-14
 
 ### Added
