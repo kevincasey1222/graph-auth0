@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [Unreleased]
 
+## 0.2.0 - 2021-09-08
+
 ### Added
 
 - Support for custom domains, and updated documentation on that.
