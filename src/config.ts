@@ -92,10 +92,9 @@ export async function validateInvocation(
     );
   }
 
-  const splitter2 = config.audience.split('.');
-  if (!(splitter2[2] === 'auth0')) {
+  if (!config.audience.match(/auth0.com/)) {
     throw new IntegrationValidationError(
-      'Problem with config {audience}. Should be https://{YOURDOMAIN}.{REGION}.auth0.com/{API}/{VERSION}',
+      'Problem with config {audience}. Should be a subdomain of auth0.com.',
     );
   }
 

@@ -44,6 +44,9 @@ Do NOT include `https://` in the Domain. It should typically be in the format
 `{YOURDOMAIN}.{YOURREGION}.auth0.com`. DO include `https://` in the Audience. It
 must be something like `https://{YOURDOMAIN}.{REGION}.auth0.com/api/v2/`.
 
+It appears that the use of the `{REGION}` subdomain is inconsistent. See your
+Auth0 tenant default domain to be sure of which one to use.
+
 If you are using a custom domain (e.g. `mycustomdomain.com`), you can use that
 domain in the Domain config variable, but you still must use the default Auth0
 tenant domain in the Audience config variable.
